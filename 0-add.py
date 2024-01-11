@@ -1,7 +1,20 @@
 #!/usr/bin/env python3
-""" 0. Basic annotations - add """
+"""
+This module provides a function
+
+The function `add` takes two arguments
+"""
 
 
 def add(a: float, b: float) -> float:
-    """ add """
+    """
+    Add two float numbers.
+
+    Parameters:
+    a (float): The first number.
+    b (float): The second number.
+
+    Returns:
+    float: The sum of the two numbers.
+    """
     return a + b
