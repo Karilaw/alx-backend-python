@@ -4,9 +4,10 @@ test_client module
 """
 
 import unittest
-from unittest.mock import patch, Mock
-from parameterized import parameterized
+from unittest.mock import patch, PropertyMock
+from parameterized import parameterized_class
 import client
+from fixtures import org_payload, repos_payload, expected_repos, apache2_repos
 
 
 class TestGithubOrgClient(unittest.TestCase):
@@ -71,3 +72,42 @@ class TestGithubOrgClient(unittest.TestCase):
         github_org_client = GithubOrgClient("test")
         result = github_org_client.has_license(repo, license_key)
         self.assertEqual(result, expected)
+
+
+@parameterized_class([
+    {"org_payload": org_payload, "repos_payload": repos_payload,
+     "expected_repos": expected_repos, "apache2_repos": apache2_repos}
+])
+class TestIntegrationGithubOrgClient(unittest.TestCase):
+    """
+    TestIntegrationGithubOrgClient Class
+    """
+    @classmethod
+    def setUpClass(cls):
+        """
+        setUpClass method
+        """
+        cls.get_patcher = patch('requests.get')
+        cls.get = cls.get_patcher.start()
+
+    @classmethod
+    def tearDownClass(cls):
+        """
+        tearDownClass method
+        """
+        cls.get_patcher.stop()
+
+    def test_public_repos(self):
+        """
+        test_public_repos method
+        """
+        self.get.return_value.json.side_effect = [
+            self.org_payload, self.repos_payload,
+            self.org_payload, self.repos_payload,
+            self.org_payload, self.repos_payload
+        ]
+
+        github_org_client = client.GithubOrgClient("test")
+        repos = github_org_client.public_repos()
+        self.assertEqual(repos, self.expected_repos)
+        self.get.assert_called()
