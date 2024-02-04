@@ -111,3 +111,33 @@ class TestIntegrationGithubOrgClient(unittest.TestCase):
         repos = github_org_client.public_repos()
         self.assertEqual(repos, self.expected_repos)
         self.get.assert_called()
+
+    def test_public_repos(self):
+        """
+        test_public_repos method
+        """
+        self.get.return_value.json.side_effect = [
+            self.org_payload, self.repos_payload,
+            self.org_payload, self.repos_payload,
+            self.org_payload, self.repos_payload
+        ]
+
+        github_org_client = client.GithubOrgClient("test")
+        repos = github_org_client.public_repos()
+        self.assertEqual(repos, self.expected_repos)
+        self.get.assert_called()
+
+    def test_public_repos_with_license(self):
+        """
+        test_public_repos_with_license method
+        """
+        self.get.return_value.json.side_effect = [
+            self.org_payload, self.repos_payload,
+            self.org_payload, self.repos_payload,
+            self.org_payload, self.repos_payload
+        ]
+
+        github_org_client = client.GithubOrgClient("test")
+        repos = github_org_client.public_repos(license="apache-2.0")
+        self.assertEqual(repos, self.apache2_repos)
+        self.get.assert_called()
